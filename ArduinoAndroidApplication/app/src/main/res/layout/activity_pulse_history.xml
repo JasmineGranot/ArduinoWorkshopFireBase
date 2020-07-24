@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_page_background_1"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp">
+
+    <TextView
+        android:id="@+id/txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/work_sans_medium"
+        android:gravity="center"
+        android:text="@string/pulse_history"
+        android:textColor="#36486b"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+
+    <TableRow android:background="#deeaee" android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/archivo_black"
+            android:gravity="center"
+            android:text="@string/date_label"
+            android:textColor="#36486b" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/archivo_black"
+            android:gravity="center"
+            android:text="@string/location"
+            android:textColor="#36486b" />
+    </TableRow>
+</TableLayout>

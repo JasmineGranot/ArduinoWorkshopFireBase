@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "314284661770",
+    "firebase_url": "https://arduinoworkshop-bfda3.firebaseio.com",
+    "project_id": "arduinoworkshop-bfda3",
+    "storage_bucket": "arduinoworkshop-bfda3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314284661770:android:7f4215bbe02281871093f3",
+        "android_client_info": {
+          "package_name": "com.example.arduinoandroidapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "314284661770-hoqghhd0bv20qea83g5tfoh4l8en41cj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.arduinoandroidapplication",
+            "certificate_hash": "e14acb58086f69e01384104d261c7d0d0a0f53ea"
+          }
+        },
+        {
+          "client_id": "314284661770-d8d7q0ibnhjuv8cpv088pp5ijkgqmsb4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWjPkOPLuZrOXFV9rzIQutRRJ14Wtzsns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "314284661770-d8d7q0ibnhjuv8cpv088pp5ijkgqmsb4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314284661770:android:1fe7a3ba0d2506af1093f3",
+        "android_client_info": {
+          "package_name": "com.example.arduionandroidappication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "314284661770-ts4hg2cem9kmsar2u5a4lu2gle0pkj1g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.arduionandroidappication",
+            "certificate_hash": "e14acb58086f69e01384104d261c7d0d0a0f53ea"
+          }
+        },
+        {
+          "client_id": "314284661770-d8d7q0ibnhjuv8cpv088pp5ijkgqmsb4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWjPkOPLuZrOXFV9rzIQutRRJ14Wtzsns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "314284661770-d8d7q0ibnhjuv8cpv088pp5ijkgqmsb4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
