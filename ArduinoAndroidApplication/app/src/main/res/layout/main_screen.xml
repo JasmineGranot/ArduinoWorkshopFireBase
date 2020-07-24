@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/login_page_background_1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/emergencyCallButton"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@drawable/emergency_call_circle_button"
+        android:fontFamily="@font/work_sans_medium"
+        android:text="@string/emergency_call"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.884" />
+
+    <Button
+        android:id="@+id/getPulseHistoryButton"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="284dp"
+        android:background="@drawable/circle_button"
+        android:fontFamily="@font/work_sans_medium"
+        android:text="@string/pulse_history"
+        android:textColor="#36486b"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.063"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/getCurrentPulseButton"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/getFallHistoryButton"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginBottom="284dp"
+        android:background="@drawable/circle_button"
+        android:fontFamily="@font/work_sans_medium"
+        android:text="@string/fall_history"
+        android:textColor="#36486b"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.786"
+        app:layout_constraintStart_toEndOf="@+id/getPulseHistoryButton"
+        app:layout_constraintTop_toBottomOf="@+id/getCurrentPulseButton"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/getCurrentPulseButton"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/circle_button"
+        android:fontFamily="@font/work_sans_medium"
+        android:text="@string/current_pulse"
+        android:textColor="#36486b"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/emergencyCallButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.242" />
+</androidx.constraintlayout.widget.ConstraintLayout>
