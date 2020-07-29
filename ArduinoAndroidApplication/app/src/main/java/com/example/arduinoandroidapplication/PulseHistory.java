@@ -1,32 +1,25 @@
 package com.example.arduinoandroidapplication;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.os.Build;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
 
 public class PulseHistory extends AppCompatActivity {
 
@@ -111,12 +104,26 @@ public class PulseHistory extends AppCompatActivity {
             tableRow = new TableRow(this);
             firstText = new TextView(this);
             secondText = new TextView(this);
+
             firstText.setLayoutParams(lp);
             firstText.setText(entry.getKey());
+            firstText.setX(250);
+            firstText.setTextColor(Color.parseColor("#000000"));
+            firstText.setTextSize(20);
+            firstText.setBackgroundColor(Color.parseColor("#deeaee"));
+
+
+
             secondText.setLayoutParams(lp);
             secondText.setText(entry.getValue());
+            secondText.setX(650);
+            secondText.setTextColor(Color.parseColor("#000000"));
+            secondText.setTextSize(20);
+            secondText.setBackgroundColor(Color.parseColor("#deeaee"));
+
             tableRow.addView(firstText);
-            tableRow.addView(secondText);
+            tableRow.addView(secondText,200,200);
+
             layout.addView(tableRow);
         }
     }
