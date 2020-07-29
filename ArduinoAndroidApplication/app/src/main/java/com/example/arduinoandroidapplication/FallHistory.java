@@ -31,7 +31,7 @@ public class FallHistory extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fall_history_new);
+        setContentView(R.layout.activity_fall_history);
 
 
         DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/falls");
