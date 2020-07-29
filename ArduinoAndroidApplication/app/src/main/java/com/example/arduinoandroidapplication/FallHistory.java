@@ -3,8 +3,10 @@ package com.example.arduinoandroidapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -32,7 +34,6 @@ public class FallHistory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fall_history);
-
 
         DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/falls");
 
@@ -89,6 +90,14 @@ public class FallHistory extends AppCompatActivity {
             }
         };
         dbref.addValueEventListener(valueEventListener);
+
+        Button showOnMapButton = (Button) findViewById(R.id.showOnMapButton);
+        showOnMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FallHistory.this, Location.class));
+            }
+        });
     }
 
 
