@@ -43,12 +43,12 @@ public class PulseHistory extends AppCompatActivity {
 
         DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/pulse_history");
 
-        dbref.addChildEventListener(new ChildEventListener() {
+        /*dbref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 map.put(snapshot.getKey(), snapshot.child("heart_rate").getValue().toString());
                 addDataToTable(map);
-                notification("Anomaly pulse");
+                //notification("Anomaly pulse");
             }
 
             @Override
@@ -76,27 +76,27 @@ public class PulseHistory extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        });*/
 
-//        ValueEventListener valueEventListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Map<String, String> map = new HashMap<>();
-//                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    String date = ds.getKey();
-//                    String heartBeat = ds.child("heart_rate").getValue().toString();
-//                    map.put(date, heartBeat);
-//                }
-//
-//                addDataToTable(map);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        };
-//        dbref.addValueEventListener(valueEventListener);
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, String> map = new HashMap<>();
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String date = ds.getKey();
+                    String heartBeat = ds.child("heart_rate").getValue().toString();
+                    map.put(date, heartBeat);
+                }
+
+                addDataToTable(map);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        dbref.addValueEventListener(valueEventListener);
     }
 
     private void addDataToTable(Map<String, String> map) {
@@ -121,7 +121,7 @@ public class PulseHistory extends AppCompatActivity {
         }
     }
 
-    private void notification(String msg){
+    /*private void notification(String msg){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("n", "n", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager manager = getSystemService(NotificationManager.class);
@@ -135,5 +135,5 @@ public class PulseHistory extends AppCompatActivity {
 
         NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
         managerCompat.notify(999, builder.build());
-    }
+    }*/
 }
