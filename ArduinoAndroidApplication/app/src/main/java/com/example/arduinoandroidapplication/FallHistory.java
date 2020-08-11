@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.System.*;
 
 public class FallHistory extends AppCompatActivity {
 
@@ -104,19 +107,25 @@ public class FallHistory extends AppCompatActivity {
     private void addDataToTable(List<String> dateList) {
         layout = (TableLayout) findViewById(R.id.fallHistoryTableLayout);
         View a = layout.getChildAt(0);
-        View b = layout.getChildAt(1);
         layout.removeAllViews();
         layout.addView(a);
-        layout.addView(b);
+        for (String element : dateList){
 
-        for(String date : dateList){
             tableRow = new TableRow(this);
             firstText = new TextView(this);
+
             firstText.setLayoutParams(lp);
-            firstText.setText(date);
+            firstText.setText(element.replace("\"",""));
+            firstText.setX(400);
+            firstText.setTextColor(Color.parseColor("#000000"));
+            firstText.setTextSize(20);
+            firstText.setBackgroundColor(Color.parseColor("#deeaee"));
+
             tableRow.addView(firstText);
             layout.addView(tableRow);
         }
+
+
     }
 
     /*private void notification(String msg){
