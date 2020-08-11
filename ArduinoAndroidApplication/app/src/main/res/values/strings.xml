@@ -15,6 +15,7 @@
     <string name="password_string">Password:</string>
     <string name="fall_history">Fall\nHistory</string>
     <string name="pulse_history">Pulse\nHistory</string>
+    <string name="rate">Rate</string>
     <string name="location">Location</string>
     <string name="emergency_call">Emergency\nCall</string>
     <string name="date_label">Date</string>
