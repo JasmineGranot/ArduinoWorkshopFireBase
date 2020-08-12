@@ -86,11 +86,11 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()) {
+                        Map<String, Object> user = new HashMap<>();
                         String userId = auth.getCurrentUser().getUid();
                         dbFirestore = FirebaseFirestore.getInstance();
                         CollectionReference collectionReference = dbFirestore.collection("Users");
                         DocumentReference documentReference = collectionReference.document(userId);
-                        Map<String, Object> user = new HashMap<>();
 
                         user.put("name", userName);
                         user.put("email", userEmail);
