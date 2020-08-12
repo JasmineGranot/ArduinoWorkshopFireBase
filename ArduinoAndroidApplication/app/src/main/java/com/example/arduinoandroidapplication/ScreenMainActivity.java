@@ -6,8 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ScreenMainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
@@ -16,6 +22,14 @@ public class ScreenMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+        auth = FirebaseAuth.getInstance();
+        TextView greeting = (TextView) findViewById(R.id.GreetingUserTxt);
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser != null){
+            String name = getUserDisplayName(currentUser);
+            name = !name.equals("") ? name : currentUser.getEmail();
+            greeting.setText("Hello " + name);
+        }
 
         Button logOutButton = (Button) findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(new View.OnClickListener() {
@@ -58,5 +72,11 @@ public class ScreenMainActivity extends AppCompatActivity {
                 startActivity(new Intent(ScreenMainActivity.this, EmergencyCall.class));
             }
         });
+    }
+
+    private String getUserDisplayName(FirebaseUser currentUser){
+        currentUser.getUid();
+        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference();
+        return "";
     }
 }
