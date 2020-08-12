@@ -1,19 +1,19 @@
 package com.example.arduinoandroidapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ScreenMainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
@@ -23,12 +23,9 @@ public class ScreenMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
         auth = FirebaseAuth.getInstance();
-        TextView greeting = (TextView) findViewById(R.id.GreetingUserTxt);
         FirebaseUser currentUser = auth.getCurrentUser();
         if(currentUser != null){
-            String name = getUserDisplayName(currentUser);
-            name = !name.equals("") ? name : currentUser.getEmail();
-            greeting.setText("Hello " + name);
+            getUserDisplayName(currentUser);
         }
 
         Button logOutButton = (Button) findViewById(R.id.logOutButton);
@@ -74,9 +71,20 @@ public class ScreenMainActivity extends AppCompatActivity {
         });
     }
 
-    private String getUserDisplayName(FirebaseUser currentUser){
-        currentUser.getUid();
-        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference();
-        return "";
+    private void getUserDisplayName(final FirebaseUser currentUser){
+        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
+                child(String.format("Users/%s", currentUser.getUid()));
+        dbref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String name = snapshot.child("name").getValue().toString();
+                name = !name.equals("") ? name : currentUser.getEmail();
+                TextView greeting = (TextView) findViewById(R.id.GreetingUserTxt);
+                greeting.setText(String.format("Hello %s", name));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 }
