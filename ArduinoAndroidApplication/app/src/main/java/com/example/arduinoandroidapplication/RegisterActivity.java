@@ -16,7 +16,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
     private TextView nameField;
@@ -26,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView passwordField;
     private FirebaseAuth auth;
     private ProgressDialog dialog;
-    private DatabaseReference dbReference;
+    private FirebaseFirestore dbFirestore;
 
 
     @Override
@@ -43,8 +48,6 @@ public class RegisterActivity extends AppCompatActivity {
         dialog = new ProgressDialog(this);
 
         auth = FirebaseAuth.getInstance();
-        dbReference = FirebaseDatabase.getInstance().getReference().child("Users");
-
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,14 +87,17 @@ public class RegisterActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()) {
                         String userId = auth.getCurrentUser().getUid();
-                        DatabaseReference currentUserDb = dbReference.child(userId);
-                        currentUserDb.child("name").setValue(userName);
-                        currentUserDb.child("email").setValue(userEmail);
-                        currentUserDb.child("phoneNumber").setValue(userPhone);
-                        currentUserDb.child("braceletId").setValue(braceletID);
+                        dbFirestore = FirebaseFirestore.getInstance();
+                        CollectionReference collectionReference = dbFirestore.collection("Users");
+                        DocumentReference documentReference = collectionReference.document(userId);
+                        Map<String, Object> user = new HashMap<>();
 
+                        user.put("name", userName);
+                        user.put("email", userEmail);
+                        user.put("phoneNumber", userPhone);
+                        user.put("braceletId", braceletID);
+                        documentReference.set(user);
                         dialog.dismiss();
-
                         Intent mainIntent = new Intent(RegisterActivity.this, ScreenMainActivity.class);
                         mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(mainIntent);
