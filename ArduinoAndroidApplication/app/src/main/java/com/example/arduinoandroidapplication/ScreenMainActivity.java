@@ -95,19 +95,5 @@ public class ScreenMainActivity extends AppCompatActivity {
                 }
             }
         });
-//        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
-//                child(String.format("Users/%s", currentUser.getUid()));
-//        dbref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                String name = snapshot.child("name").getValue().toString();
-//                name = !name.equals("") ? name : currentUser.getEmail();
-//                TextView greeting = (TextView) findViewById(R.id.GreetingUserTxt);
-//                greeting.setText(String.format("Hello %s", name));
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) { }
-//        });
     }
 }
