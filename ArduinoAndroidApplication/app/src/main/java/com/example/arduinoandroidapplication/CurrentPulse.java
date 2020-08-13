@@ -3,7 +3,12 @@ package com.example.arduinoandroidapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +67,10 @@ public class CurrentPulse extends AppCompatActivity {
                     ref.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                            Animation animation;
+
                             currentPulse = (TextView) findViewById(R.id.currentPulse);
+
                             currentPulse.setText(snapshot.getValue().toString());
                         }
 
