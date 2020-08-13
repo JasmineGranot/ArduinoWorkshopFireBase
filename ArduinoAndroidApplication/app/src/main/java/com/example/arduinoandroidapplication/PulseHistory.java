@@ -82,7 +82,6 @@ public class PulseHistory extends AppCompatActivity {
                         }
                     };
                     dbref.addValueEventListener(valueEventListener);
-
                 }
             }
         });
