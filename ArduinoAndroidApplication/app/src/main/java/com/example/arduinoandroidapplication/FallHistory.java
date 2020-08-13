@@ -2,7 +2,6 @@ package com.example.arduinoandroidapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -14,18 +13,25 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.System.*;
 
 public class FallHistory extends AppCompatActivity {
 
@@ -33,69 +39,18 @@ public class FallHistory extends AppCompatActivity {
     private TableRow tableRow;
     private TextView firstText;
     private Map<String, String> map = new HashMap<>();
+    private FirebaseFirestore dbFirestore;
+    private String braceletId;
+    private FirebaseAuth auth;
     TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fall_history);
-
-        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/falls");
-
-        /*dbref.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                map.put(snapshot.getKey(), snapshot.child("heart_rate").getValue().toString());
-                addDataToTable(map);
-                //notification("Anomaly pulse");
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                for(DataSnapshot ds : snapshot.getChildren()) {
-                    String date = ds.getKey();
-                    String heartBeat = ds.child("heart_rate").getValue().toString();
-                    map.put(date, heartBeat);
-                }
-
-                addDataToTable(map);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
-
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> dateList = new LinkedList<>();
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String date = ds.getKey();
-                    dateList.add(date);
-                }
-
-                addDataToTable(dateList);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        dbref.addValueEventListener(valueEventListener);
-
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        getBraceletData(currentUser);
         Button showOnMapButton = (Button) findViewById(R.id.showOnMapButton);
         showOnMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +60,43 @@ public class FallHistory extends AppCompatActivity {
         });
     }
 
+
+    private void getBraceletData(final FirebaseUser currentUser){
+        dbFirestore = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = dbFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(currentUser.getUid());
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    braceletId = document.get("braceletId").toString();
+                    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
+                            child(String.format("%s/falls", braceletId));
+
+                    ValueEventListener valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            List<String> dateList = new LinkedList<>();
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                String date = ds.getKey();
+                                dateList.add(date);
+                            }
+
+                            addDataToTable(dateList);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    dbref.addValueEventListener(valueEventListener);
+                }
+            }
+        });
+    }
 
     private void addDataToTable(List<String> dateList) {
         GradientDrawable gd = new GradientDrawable();
@@ -137,24 +129,6 @@ public class FallHistory extends AppCompatActivity {
             tableRow.addView(firstText,1058,50);
             layout.addView(tableRow);
         }
-
-
     }
-
-    /*private void notification(String msg){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("n", "n", NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "n")
-                .setContentText(String.format("New %s detected!", msg))
-                .setAutoCancel(true)
-                .setPriority( NotificationCompat.PRIORITY_MAX);
-
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
-        managerCompat.notify(999, builder.build());
-    }*/
 }
 

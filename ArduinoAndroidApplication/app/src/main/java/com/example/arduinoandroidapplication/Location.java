@@ -11,79 +11,101 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Location extends FragmentActivity implements OnMapReadyCallback {
 
-        private GoogleMap mMap;
-        private Double lat, lng;
-        LatLng fallLocation;
+    private GoogleMap mMap;
+    private Double lat, lng;
+    LatLng fallLocation;
+    private FirebaseFirestore dbFirestore;
+    private String braceletId;
+    private FirebaseAuth auth;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_location);
-            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_location);
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
 
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera. In this case,
-         * we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to install
-         * it inside the SupportMapFragment. This method will only be triggered once the user has
-         * installed Google Play services and returned to the app.
-         */
-        @Override
-        public void onMapReady(GoogleMap googleMap) {
-            mMap = googleMap;
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        dbFirestore = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = dbFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(currentUser.getUid());
 
-            DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/falls");
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    braceletId = document.get("braceletId").toString();
+                    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
+                            child(String.format("%s/falls", braceletId));
 
-            ValueEventListener valueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        String date = ds.getKey();
-                        Object data = ds.getValue();
-                        if (data != null) {
-                            if (data.getClass() == HashMap.class) {
-                                HashMap<String, Double> coords = (HashMap<String, Double>) data;
+                    ValueEventListener valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                String date = ds.getKey();
+                                Object data = ds.getValue();
+                                if (data != null) {
+                                    if (data.getClass() == HashMap.class) {
+                                        HashMap<String, Double> coords = (HashMap<String, Double>) data;
 
-                                if (!coords.isEmpty()) {
-                                    lat = coords.get("lat");
-                                    lng = coords.get("long");
-                                    fallLocation = new LatLng(lat, lng);
-                                    mMap.addMarker(new MarkerOptions().position(fallLocation).title(date));
+                                        if (!coords.isEmpty()) {
+                                            lat = coords.get("lat");
+                                            lng = coords.get("long");
+                                            fallLocation = new LatLng(lat, lng);
+                                            mMap.addMarker(new MarkerOptions().position(fallLocation).title(date));
+                                        }
+                                    }
                                 }
                             }
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(fallLocation));
                         }
-                    }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(fallLocation));
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    dbref.addValueEventListener(valueEventListener);
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) { }
-            };
-            dbref.addValueEventListener(valueEventListener);
-
-
-
-            // Add a marker in Sydney and move the camera
-
-        }
-
+            }
+        });
+    }
 }
 
 
