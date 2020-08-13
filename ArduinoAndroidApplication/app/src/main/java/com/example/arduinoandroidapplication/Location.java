@@ -78,6 +78,8 @@ public class Location extends FragmentActivity implements OnMapReadyCallback {
             };
             dbref.addValueEventListener(valueEventListener);
 
+
+
             // Add a marker in Sydney and move the camera
 
         }
