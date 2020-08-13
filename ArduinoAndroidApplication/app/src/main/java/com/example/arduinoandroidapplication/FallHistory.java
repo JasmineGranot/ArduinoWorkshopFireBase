@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -105,23 +107,34 @@ public class FallHistory extends AppCompatActivity {
 
 
     private void addDataToTable(List<String> dateList) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setColor(Color.parseColor("#DCDCDC"));
+        gd.setCornerRadius(5);
+        gd.setStroke(1, 0xFF000000);
+
         layout = (TableLayout) findViewById(R.id.fallHistoryTableLayout);
         View a = layout.getChildAt(0);
+        View b = layout.getChildAt(1);
+        b.setBackground(gd);
         layout.removeAllViews();
         layout.addView(a);
+        layout.addView(b);
         for (String element : dateList){
-
+            GradientDrawable gd_in = new GradientDrawable();
+            gd_in.setColor(Color.parseColor("#F8F8FF"));
+            gd_in.setCornerRadius(5);
+            gd_in.setStroke(1, 0xFF000000);
             tableRow = new TableRow(this);
             firstText = new TextView(this);
-
+            firstText.setBackground(gd_in);
             firstText.setLayoutParams(lp);
-            firstText.setText(element.replace("\"",""));
-            firstText.setX(400);
+            firstText.setText(element.replace("\"","") +"\n");
+            firstText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            firstText.setX(0);
             firstText.setTextColor(Color.parseColor("#000000"));
-            firstText.setTextSize(20);
-            firstText.setBackgroundColor(Color.parseColor("#deeaee"));
+            firstText.setTextSize(15);
 
-            tableRow.addView(firstText);
+            tableRow.addView(firstText,1058,50);
             layout.addView(tableRow);
         }
 

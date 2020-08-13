@@ -16,7 +16,7 @@
         <TableLayout
             android:id="@+id/fallHistoryTableLayout"
             android:layout_width="match_parent"
-            android:layout_height="671dp"
+            android:layout_height="880dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp">
 
@@ -36,7 +36,7 @@
                 android:id="@+id/headerTableRow"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#deeaee"
+                android:background="#DCDCDC"
                 android:padding="10dp">
 
                 <TextView
@@ -44,9 +44,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/archivo_black"
+                    android:fontFamily="@font/work_sans_medium"
                     android:gravity="center"
                     android:text="@string/date_label"
+                    android:textSize="18sp"
                     android:textColor="#36486b" />
 
             </TableRow>
@@ -57,9 +58,10 @@
             android:id="@+id/showOnMapButton"
             style="@android:style/Widget.Button.Toggle"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:fontFamily="@font/work_sans_medium"
-            android:text="@string/show_location" />
+            android:text="@string/show_location"
+            android:textSize="20sp"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

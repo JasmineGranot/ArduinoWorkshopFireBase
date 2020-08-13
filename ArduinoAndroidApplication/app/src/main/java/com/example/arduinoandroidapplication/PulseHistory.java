@@ -1,6 +1,7 @@
 package com.example.arduinoandroidapplication;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TableLayout;
@@ -89,36 +90,47 @@ public class PulseHistory extends AppCompatActivity {
     }
 
     private void addDataToTable(Map<String, String> map) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setColor(Color.parseColor("#DCDCDC"));
+        gd.setCornerRadius(5);
+        gd.setStroke(1, 0xFF000000);
+
         layout = (TableLayout) findViewById(R.id.tableLayout);
         View a = layout.getChildAt(0);
         View b = layout.getChildAt(1);
+        b.setBackground(gd);
         layout.removeAllViews();
         layout.addView(a);
         layout.addView(b);
 
         for(Map.Entry<String, String> entry : map.entrySet()){
+            GradientDrawable gd_in = new GradientDrawable();
+            gd_in.setColor(Color.parseColor("#F8F8FF"));
+            gd_in.setCornerRadius(5);
+            gd_in.setStroke(1, 0xFF000000);
+
             tableRow = new TableRow(this);
             firstText = new TextView(this);
             secondText = new TextView(this);
-
+            firstText.setBackground(gd_in);
             firstText.setLayoutParams(lp);
-            firstText.setText(entry.getKey());
-            firstText.setX(250);
+            firstText.setText(entry.getKey().replace("\"",""));
+            firstText.setX(0);
+            firstText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             firstText.setTextColor(Color.parseColor("#000000"));
-            firstText.setTextSize(20);
-            firstText.setBackgroundColor(Color.parseColor("#deeaee"));
+            firstText.setTextSize(15);
 
 
-
+            secondText.setBackground(gd_in);
             secondText.setLayoutParams(lp);
             secondText.setText(entry.getValue());
-            secondText.setX(650);
+            secondText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            secondText.setX(50);
             secondText.setTextColor(Color.parseColor("#000000"));
-            secondText.setTextSize(20);
-            secondText.setBackgroundColor(Color.parseColor("#deeaee"));
+            secondText.setTextSize(15);
 
-            tableRow.addView(firstText);
-            tableRow.addView(secondText,200,200);
+            tableRow.addView(firstText,500,60);
+            tableRow.addView(secondText,508,60);
 
             layout.addView(tableRow);
         }
