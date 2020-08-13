@@ -1,7 +1,6 @@
 package com.example.arduinoandroidapplication;
 
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TableLayout;
@@ -11,11 +10,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +34,10 @@ public class PulseHistory extends AppCompatActivity {
     private TableRow tableRow;
     private TextView firstText, secondText;
     private Map<String, String> map = new HashMap<>();
+    private FirebaseFirestore dbFirestore;
+    private String braceletId;
+    private FirebaseAuth auth;
+
     TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
 
     @Override
@@ -34,62 +45,47 @@ public class PulseHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pulse_history);
 
-        DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().child("100/pulse_history");
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        getUserBraceletID(currentUser);
+    }
 
-        /*dbref.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                map.put(snapshot.getKey(), snapshot.child("heart_rate").getValue().toString());
-                addDataToTable(map);
-                //notification("Anomaly pulse");
-            }
+    private void getUserBraceletID(final FirebaseUser currentUser){
+        dbFirestore = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = dbFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(currentUser.getUid());
 
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                for(DataSnapshot ds : snapshot.getChildren()) {
-                    String date = ds.getKey();
-                    String heartBeat = ds.child("heart_rate").getValue().toString();
-                    map.put(date, heartBeat);
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    braceletId = document.get("braceletId").toString();
+                    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
+                            child(String.format("%s/pulse_history", braceletId));
+                    ValueEventListener valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Map<String, String> map = new HashMap<>();
+                            for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                                String date = ds.getKey();
+                                String heartBeat = ds.child("heart_rate").getValue().toString();
+                                map.put(date, heartBeat);
+                            }
+
+                            addDataToTable(map);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    };
+                    dbref.addValueEventListener(valueEventListener);
+
                 }
-
-                addDataToTable(map);
             }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });*/
-
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, String> map = new HashMap<>();
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String date = ds.getKey();
-                    String heartBeat = ds.child("heart_rate").getValue().toString();
-                    map.put(date, heartBeat);
-                }
-
-                addDataToTable(map);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        dbref.addValueEventListener(valueEventListener);
+        });
     }
 
     private void addDataToTable(Map<String, String> map) {
@@ -127,20 +123,4 @@ public class PulseHistory extends AppCompatActivity {
             layout.addView(tableRow);
         }
     }
-
-    /*private void notification(String msg){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("n", "n", NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "n")
-                .setContentText(String.format("New %s detected!", msg))
-                .setAutoCancel(true)
-                .setPriority( NotificationCompat.PRIORITY_MAX);
-
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
-        managerCompat.notify(999, builder.build());
-    }*/
 }
