@@ -1,8 +1,23 @@
 package com.example.arduinoandroidapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +41,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ScreenMainActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore dbFirestore;
+
+    FirebaseDatabase database;
+    DatabaseReference reference;
+    private String braceletId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +98,94 @@ public class ScreenMainActivity extends AppCompatActivity {
                 startActivity(new Intent(ScreenMainActivity.this, EmergencyCall.class));
             }
         });
+
+        dbFirestore = FirebaseFirestore.getInstance();
+        CollectionReference collectionReference = dbFirestore.collection("Users");
+        DocumentReference documentReference = collectionReference.document(currentUser.getUid());
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    braceletId = document.get("braceletId").toString();
+                    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
+                            child(String.format("%s/falls", braceletId));
+
+                    dbref.addChildEventListener(new ChildEventListener() {
+
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                            String dateTime = String.format(
+                                    "%s %s", snapshot.getKey(), snapshot.child("time").getValue());
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                            LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
+
+                            LocalDateTime now = LocalDateTime.now();
+                            if(givenDateTime.isAfter(now.minusMinutes(5).plusHours(3))) {
+                                notification();
+
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                }
+
+
+            }
+
+            private void notification() {
+
+                new AlertDialog.Builder(ScreenMainActivity.this)
+                        .setTitle("Warning")
+                        .setMessage("Fall Detected!")
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton("Call Emergency", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String number = "+972526586120".trim();
+                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", number, null));
+                                startActivity(intent);
+                            }
+                        })
+
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton("Dismiss", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
+            }
+
+        });
     }
 
-    private void getUserDisplayName(final FirebaseUser currentUser){
+
+
+
+    private void getUserDisplayName(final FirebaseUser currentUser) {
         dbFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = dbFirestore.collection("Users");
         DocumentReference documentReference = collectionReference.document(currentUser.getUid());
