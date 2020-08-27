@@ -13,7 +13,7 @@
         android:background="@drawable/small_circle_button"
         android:fontFamily="@font/work_sans_medium"
         android:gravity="center"
-        android:text="@string/current_pulse"
+
         android:textColor="#36486b"
         android:textSize="60sp"
         app:layout_constraintBottom_toBottomOf="parent"

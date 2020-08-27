@@ -3,6 +3,7 @@ package com.example.arduinoandroidapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,12 +27,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Thread.sleep;
+
 public class CurrentPulse extends AppCompatActivity {
     private FirebaseAuth auth;
     private DatabaseReference ref;
     private TextView currentPulse;
     private FirebaseFirestore dbFirestore;
     private String braceletId;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,14 @@ public class CurrentPulse extends AppCompatActivity {
         dbFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = dbFirestore.collection("Users");
         DocumentReference documentReference = collectionReference.document(currentUser.getUid());
-
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Waiting for data...");
+        dialog.show();
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -71,7 +82,12 @@ public class CurrentPulse extends AppCompatActivity {
 
                         }
                     });
+                    dialog.dismiss();
                 }
+                else {
+                    Toast.makeText(CurrentPulse.this, "Must Insert User Name!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
