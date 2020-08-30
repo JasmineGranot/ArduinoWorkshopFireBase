@@ -25,7 +25,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -78,9 +82,7 @@ public class PulseHistory extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
+                        public void onCancelled(@NonNull DatabaseError error) { }
                     };
                     dbref.addValueEventListener(valueEventListener);
                 }
@@ -102,7 +104,18 @@ public class PulseHistory extends AppCompatActivity {
         layout.addView(a);
         layout.addView(b);
 
-        for(Map.Entry<String, String> entry : map.entrySet()){
+        List<Map.Entry<String, String> > list =
+                new LinkedList<Map.Entry<String, String> >(map.entrySet());
+
+        Collections.sort(list, new Comparator<Map.Entry<String, String> >() {
+            public int compare(Map.Entry<String, String> o1,
+                               Map.Entry<String, String> o2)
+            {
+                return (o2.getKey()).compareTo(o1.getKey());
+            }
+        });
+
+        for(Map.Entry<String, String> entry : list){
             GradientDrawable gd_in = new GradientDrawable();
             gd_in.setColor(Color.parseColor("#F8F8FF"));
             gd_in.setCornerRadius(5);
@@ -119,17 +132,16 @@ public class PulseHistory extends AppCompatActivity {
             firstText.setTextColor(Color.parseColor("#000000"));
             firstText.setTextSize(15);
 
-
             secondText.setBackground(gd_in);
             secondText.setLayoutParams(lp);
             secondText.setText(entry.getValue());
             secondText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            secondText.setX(50);
+            secondText.setX(0);
             secondText.setTextColor(Color.parseColor("#000000"));
             secondText.setTextSize(15);
 
-            tableRow.addView(firstText,500,60);
-            tableRow.addView(secondText,508,60);
+            tableRow.addView(firstText,520,60);
+            tableRow.addView(secondText,530,60);
 
             layout.addView(tableRow);
         }
