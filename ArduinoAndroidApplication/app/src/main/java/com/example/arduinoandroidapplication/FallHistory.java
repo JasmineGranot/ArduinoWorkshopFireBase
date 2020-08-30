@@ -195,9 +195,7 @@ public class FallHistory extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
+                        public void onCancelled(@NonNull DatabaseError error) { }
                     };
                     dbref.addValueEventListener(valueEventListener);
                     onResume();
@@ -234,7 +232,7 @@ public class FallHistory extends AppCompatActivity {
             firstText.setTextColor(Color.parseColor("#000000"));
             firstText.setTextSize(15);
 
-            tableRow.addView(firstText,1058,50);
+            tableRow.addView(firstText,1058,60);
             layout.addView(tableRow);
         }
     }
