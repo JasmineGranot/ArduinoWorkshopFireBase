@@ -36,6 +36,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import pl.bclogic.pulsator4droid.library.PulsatorLayout;
+
 public class CurrentPulse extends AppCompatActivity {
     private FirebaseAuth auth;
     private DatabaseReference ref;
@@ -49,6 +51,9 @@ public class CurrentPulse extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_pulse);
+
+        PulsatorLayout pulsatorLayout = (PulsatorLayout)findViewById(R.id.pulsator);
+        pulsatorLayout.start();
 
         auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser() != null) {

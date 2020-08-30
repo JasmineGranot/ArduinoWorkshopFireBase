@@ -26,4 +26,5 @@
     <string name="show_location">Show Location Of Falls On Map</string>
     <string name="log_out_button">Log Out</string>
     <string name="greeting">Hello {} </string>
+    <string name="pulse_calculation">Calculating...</string>
 </resources>

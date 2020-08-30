@@ -393,9 +393,8 @@ void extractCurrentDate()
 }
 
 void writeFallDataToFirebase(){
-  Firebase.setFloat("100/falls/" + dayStamp + "/lat", latitude);
-  Firebase.setFloat("100/falls/" + dayStamp + "/long", longitude);
-  Firebase.setString("100/falls/" + dayStamp + "time", timeStamp);
+  Firebase.setFloat("100/falls/" + dayStamp + " " + timeStamp + "/lat", latitude);
+  Firebase.setFloat("100/falls/" + dayStamp + " " + timeStamp + "/long", longitude);
    
   // handle error 
   if (Firebase.failed()) { 
@@ -407,8 +406,7 @@ void writeFallDataToFirebase(){
 }
 
 void writePulseAnomalyToDatabase(){
-  Firebase.setFloat("100/pulse_history/" + dayStamp + "/heart_rate", heartRate);
-  Firebase.setString("100/pulse_history/" + dayStamp + "/time", timeStamp);
+  Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", heartRate);
   
   // handle error 
   if (Firebase.failed()) { 
