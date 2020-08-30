@@ -45,7 +45,8 @@ public class ScreenMainActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference reference;
     private String braceletId;
-
+    DatabaseReference falldbref;
+    DatabaseReference pulsedbref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,81 +110,105 @@ public class ScreenMainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     braceletId = document.get("braceletId").toString();
-                    DatabaseReference dbref = FirebaseDatabase.getInstance().getReference().
-                            child(String.format("%s/falls", braceletId));
-
-                    dbref.addChildEventListener(new ChildEventListener() {
-
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                            String dateTime = String.format(
-                                    "%s %s", snapshot.getKey(), snapshot.child("time").getValue());
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                            LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
-
-                            LocalDateTime now = LocalDateTime.now();
-                            if(givenDateTime.isAfter(now.minusMinutes(5).plusHours(3))) {
-                                notification();
-
-                            }
-                        }
-
-                        @Override
-                        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                        }
-
-                        @Override
-                        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-                        }
-
-                        @Override
-                        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
+                    onResume();
                 }
-
-
             }
-
-            private void notification() {
-
-                new AlertDialog.Builder(ScreenMainActivity.this)
-                        .setTitle("Warning")
-                        .setMessage("Fall Detected!")
-
-                        // Specifying a listener allows you to take an action before dismissing the dialog.
-                        // The dialog is automatically dismissed when a dialog button is clicked.
-                        .setPositiveButton("Call Emergency", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                String number = "+972526586120".trim();
-                                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", number, null));
-                                startActivity(intent);
-                            }
-                        })
-
-                        // A null listener allows the button to dismiss the dialog and take no further action.
-                        .setNegativeButton("Dismiss", null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-
-            }
-
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(braceletId != null) {
+            pulsedbref = FirebaseDatabase.getInstance().getReference().
+                    child(String.format("%s/pulse_history", braceletId));
 
+            pulsedbref.addChildEventListener(new ChildEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    String dateTime = String.format("%s", snapshot.getKey());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
+                    LocalDateTime now = LocalDateTime.now().plusHours(3);
 
+                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                            (!snapshot.hasChild("seen"))){
+                        notification("Pulse Anomaly");
+                        pulsedbref.child(snapshot.getKey()).child("seen").setValue(true);
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
+
+            falldbref = FirebaseDatabase.getInstance().getReference().
+                    child(String.format("%s/falls", braceletId));
+
+            falldbref.addChildEventListener(new ChildEventListener() {
+
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    String dateTime = String.format("%s", snapshot.getKey());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
+
+                    LocalDateTime now = LocalDateTime.now().plusHours(3);
+
+                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                            (!snapshot.hasChild("seen"))){
+                        notification("Fall");
+                        falldbref.child(snapshot.getKey()).child("seen").setValue(true);
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
+        }
+    }
+
+    private void notification(String msg) {
+        new AlertDialog.Builder(ScreenMainActivity.this)
+                .setTitle("Warning")
+                .setMessage(String.format("%s Detected!", msg))
+
+                // Specifying a listener allows you to take an action before dismissing the dialog.
+                // The dialog is automatically dismissed when a dialog button is clicked.
+                .setPositiveButton("Call Emergency", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String number = "+972526586120".trim();
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", number, null));
+                        startActivity(intent);
+                    }
+                })
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setNegativeButton("Dismiss", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
+    }
 
     private void getUserDisplayName(final FirebaseUser currentUser) {
         dbFirestore = FirebaseFirestore.getInstance();
