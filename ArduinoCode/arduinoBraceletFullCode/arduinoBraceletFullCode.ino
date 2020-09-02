@@ -13,10 +13,10 @@
 
 //================================ Wifi ================================
 WiFiServer  server(80);
-char        ssid[]      = "Oslo";            // your network SSID name
-char        pass[]      = "0526586120";      // your network password
-//char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
-//char        pass[]      = "0542005293";      // your network password
+//char        ssid[]      = "Oslo";            // your network SSID name
+//char        pass[]      = "0526586120";      // your network password
+char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
+char        pass[]      = "0542005293";      // your network password
 //================================ Wifi ================================
 
 //============================== Location ==============================
@@ -44,12 +44,15 @@ String    timeStamp;
 
 //================================ Pulse ===============================
 int           sensorPin       =     A0;                 // A0 is the input pin for the heart rate sensor
-float         sensorValue     =     0;                  // Variable to store the value coming from the sensor
-int           pulseCount      =     0;
-unsigned long startTime       =     0;
-int           heartRate       =     0;
-boolean       counted         =     false;
 boolean       isPulseAnomaly  =     false;
+float         mes;
+float         maxValue        =     0;
+float         minValue        =     2000;
+float         firstRead;
+float         secondRead;
+int           startTime       =     millis();
+int           pulseCount      =     1;
+int           pulse;
 //================================ Pulse ===============================
 
 //=========================== Fall Detection ===========================
@@ -77,14 +80,14 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, pass);
-  while (WiFi.status() != WL_CONNECTED) 
+  //Serial.print("Connecting to ");
+  //Serial.println(ssid);
+  //WiFi.begin(ssid, pass);
+  /*while (WiFi.status() != WL_CONNECTED) 
   {
     delay(500);
     Serial.print(".");
-  }
+  }*/
 
   // Connect to Firebase:
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH); 
@@ -126,17 +129,17 @@ void setup()
 
 void loop() 
 {
-  if(detectFall())
+  /*if(detectFall())
   {
     handleClientCommunication();
     writeFallDataToFirebase();
   }
 
-  delay(1000);
+  delay(1000);*/
   
   if(detectPulseAnomaly()){
-    handleClientCommunication();
-    writePulseAnomalyToDatabase();
+    //handleClientCommunication();
+    //writePulseAnomalyToDatabase();
   }
 }
 
@@ -155,29 +158,46 @@ void handleClientCommunication(){
 }
 
 bool detectPulseAnomaly() {
-  startTime = millis();
-  while (millis()  < startTime + 10000)               // Reading pulse sensor for 10 seconds
-  {
-    sensorValue = analogRead(sensorPin);
-    if (sensorValue > 610 && counted == false)        // Threshold value is 610
-    {
-      pulseCount++;
-      Serial.print ("count = ");
-      Serial.println (pulseCount);
-      delay(200);
-      counted = true;
+  while(millis() < startTime + 5000){
+    mes = analogRead(sensorPin);
+    if(mes > maxValue){
+      maxValue = mes;
     }
-    else if (sensorValue < 610)
-    {
-      counted = false;
+    if(mes < minValue){
+      minValue = mes;
     }
+    delay(10);
   }
-  
-  heartRate = pulseCount * 6;                         // Multiply the count by 6 to get beats per minute
-  writePulseToDatabse();
-  pulseCount = 0;
 
-  if(heartRate < 60 || heartRate > 100) {
+  Serial.print("max value");
+  Serial.println(maxValue);
+  maxValue = (maxValue + minValue)/2;
+  Serial.print("min value");
+  Serial.println(minValue);
+
+
+  startTime = millis();
+  pulseCount = 0;
+  firstRead = analogRead(sensorPin);
+  while(millis() < startTime + 10000){
+    Serial.print("first read: ");
+    Serial.println(firstRead);
+    delay(160);
+    secondRead = analogRead(sensorPin);
+    Serial.print("second read: ");
+    Serial.println(secondRead);
+    if(secondRead > maxValue && firstRead < maxValue) {
+      pulseCount++;
+      Serial.println(pulseCount);
+    }
+    firstRead = secondRead;
+  }
+
+  pulse = pulseCount * 6;
+  Serial.println(pulse);
+  //writePulseToDatabse();
+
+  if(pulse < 60 || pulse > 100) {
     isPulseAnomaly = true;
   }
   
@@ -185,7 +205,7 @@ bool detectPulseAnomaly() {
 }
 
 void writePulseToDatabse(){
-  Firebase.setInt("100/current_pulse/", heartRate);
+  Firebase.setInt("100/current_pulse/", pulse);
   // handle error 
   if (Firebase.failed()) { 
       Serial.print("pushing /logs failed:"); 
@@ -405,7 +425,7 @@ void writeFallDataToFirebase(){
   delay(1000); 
 }
 
-void writePulseAnomalyToDatabase(){
+/*void writePulseAnomalyToDatabase(){
   Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", heartRate);
   
   // handle error 
@@ -415,4 +435,4 @@ void writePulseAnomalyToDatabase(){
       return; 
    } 
   delay(1000); 
-}
+}*/
