@@ -13,7 +13,7 @@
     <string name="bracelet_id">Bracele\nID:</string>
     <string name="id">Bracelet ID</string>
     <string name="password_string">Password:</string>
-    <string name="fall_history">Fall History</string>
+    <string name="fall_history">Fall\nHistory</string>
     <string name="pulse_history">Pulse\nHistory</string>
     <string name="rate">Rate</string>
     <string name="location">Location</string>
@@ -26,4 +26,5 @@
     <string name="show_location">Show Location Of Falls On Map</string>
     <string name="log_out_button">Log Out</string>
     <string name="greeting">Hello {} </string>
+    <string name="pulse_calculation">Calculating...</string>
 </resources>
