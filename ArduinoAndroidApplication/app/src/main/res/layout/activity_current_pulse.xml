@@ -24,6 +24,8 @@
         android:background="@drawable/small_circle_button"
         android:fontFamily="@font/varela_round"
         android:gravity="center"
+        android:textColor="#000000"
+        android:textSize="60sp"
         android:text="@string/pulse_calculation"
         android:textColor="#36486b"
         android:textSize="50sp"
