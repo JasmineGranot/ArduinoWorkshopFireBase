@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
+        <item>@font/acme</item>
+        <item>@font/andika</item>
+        <item>@font/annie_use_your_telescope</item>
         <item>@font/archivo_black</item>
+        <item>@font/baloo</item>
         <item>@font/basic</item>
+        <item>@font/cairo</item>
         <item>@font/candal</item>
+        <item>@font/coming_soon</item>
+        <item>@font/convergence</item>
         <item>@font/fira_sans_medium</item>
+        <item>@font/krona_one</item>
         <item>@font/londrina_sketch</item>
+        <item>@font/oxygen</item>
         <item>@font/ramabhadra</item>
         <item>@font/secular_one</item>
+        <item>@font/sniglet</item>
         <item>@font/syncopate_bold</item>
+        <item>@font/varela_round</item>
         <item>@font/work_sans_medium</item>
     </array>
 </resources>

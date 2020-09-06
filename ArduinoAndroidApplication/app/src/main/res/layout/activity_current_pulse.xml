@@ -6,16 +6,27 @@
     android:layout_height="match_parent"
     android:background="@drawable/login_page_background_1">
 
+    <pl.bclogic.pulsator4droid.library.PulsatorLayout
+        android:id="@+id/pulsator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:pulse_count="5"
+        app:pulse_duration="2000"
+        app:pulse_repeat="0"
+        app:pulse_color="@color/colorAccent"
+        app:pulse_startFromScratch="false"
+        app:pulse_interpolator="Linear" />
+
     <TextView
         android:id="@+id/currentPulse"
         android:layout_width="320dp"
         android:layout_height="320dp"
         android:background="@drawable/small_circle_button"
-        android:fontFamily="@font/work_sans_medium"
+        android:fontFamily="@font/varela_round"
         android:gravity="center"
-
+        android:text="@string/pulse_calculation"
         android:textColor="#36486b"
-        android:textSize="60sp"
+        android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

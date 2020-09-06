@@ -7,8 +7,10 @@ import android.util.Pair;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -59,6 +61,9 @@ public class Location extends FragmentActivity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        final UiSettings settings = mMap.getUiSettings();
+        settings.setZoomControlsEnabled(true);
+
         auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         dbFirestore = FirebaseFirestore.getInstance();
@@ -93,7 +98,7 @@ public class Location extends FragmentActivity implements OnMapReadyCallback {
                                     }
                                 }
                             }
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(fallLocation));
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(fallLocation, 16.0f));
                         }
 
                         @Override
