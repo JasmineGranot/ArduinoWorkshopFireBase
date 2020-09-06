@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Thread.sleep;
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class CurrentPulse extends AppCompatActivity {
@@ -44,6 +46,7 @@ public class CurrentPulse extends AppCompatActivity {
     private TextView currentPulse;
     private FirebaseFirestore dbFirestore;
     private String braceletId;
+    private ProgressDialog dialog;
     DatabaseReference falldbref;
     DatabaseReference pulsedbref;
 
@@ -161,7 +164,14 @@ public class CurrentPulse extends AppCompatActivity {
         dbFirestore = FirebaseFirestore.getInstance();
         CollectionReference collectionReference = dbFirestore.collection("Users");
         DocumentReference documentReference = collectionReference.document(currentUser.getUid());
-
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Waiting for data...");
+        dialog.show();
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -183,9 +193,14 @@ public class CurrentPulse extends AppCompatActivity {
 
                         }
                     });
-
+                  
+                    dialog.dismiss();
                     onResume();
                 }
+                else {
+                    Toast.makeText(CurrentPulse.this, "Must Insert User Name!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }

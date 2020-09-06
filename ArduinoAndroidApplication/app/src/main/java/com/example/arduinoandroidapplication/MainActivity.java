@@ -3,6 +3,7 @@ package com.example.arduinoandroidapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,11 +16,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import static java.lang.Thread.sleep;
+
 public class MainActivity extends AppCompatActivity {
     private EditText signInEmail;
     private EditText signInPassword;
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        dialog = new ProgressDialog(this);
         Button signInButton = (Button) findViewById(R.id.signInButton);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startSignIn() {
+
+
         String userEmail = signInEmail.getText().toString();
         String userPassword = signInPassword.getText().toString();
 
@@ -73,12 +80,16 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Must Insert Password!", Toast.LENGTH_SHORT).show();
         }
         else {
+            dialog.setMessage("Signing in...");
+            dialog.show();
             auth.signInWithEmailAndPassword(userEmail, userPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    dialog.dismiss();
                     if (!task.isSuccessful()) {
                         Toast.makeText(MainActivity.this, "Error Signing In!", Toast.LENGTH_LONG).show();
                     }
+
                 }
             });
 
