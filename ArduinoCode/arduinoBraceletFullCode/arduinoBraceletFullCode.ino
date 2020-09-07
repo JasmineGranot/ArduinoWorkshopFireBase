@@ -44,12 +44,16 @@ String    timeStamp;
 
 //================================ Pulse ===============================
 int           sensorPin       =     A0;                 // A0 is the input pin for the heart rate sensor
-float         sensorValue     =     0;                  // Variable to store the value coming from the sensor
-int           pulseCount      =     0;
-unsigned long startTime       =     0;
-int           heartRate       =     0;
-boolean       counted         =     false;
 boolean       isPulseAnomaly  =     false;
+float         mes;
+float         maxValue        =     0;
+float         minValue        =     10000;
+float         firstRead;
+float         secondRead;
+int           startTime       =     millis();
+int           pulseCount      =     1;
+int           pulse;
+int           methodCounter   =     0;
 //================================ Pulse ===============================
 
 //=========================== Fall Detection ===========================
@@ -155,29 +159,52 @@ void handleClientCommunication(){
 }
 
 bool detectPulseAnomaly() {
+  methodCounter++;
+  maxValue = 0;
   startTime = millis();
-  while (millis()  < startTime + 10000)               // Reading pulse sensor for 10 seconds
-  {
-    sensorValue = analogRead(sensorPin);
-    if (sensorValue > 610 && counted == false)        // Threshold value is 610
-    {
-      pulseCount++;
-      Serial.print ("count = ");
-      Serial.println (pulseCount);
-      delay(200);
-      counted = true;
-    }
-    else if (sensorValue < 610)
-    {
-      counted = false;
-    }
-  }
   
-  heartRate = pulseCount * 6;                         // Multiply the count by 6 to get beats per minute
-  writePulseToDatabse();
-  pulseCount = 0;
+  while(millis() < startTime + 5000){
+    mes = analogRead(sensorPin);
+    if(mes > maxValue){
+      maxValue = mes;
+    }
+    if(mes < minValue){
+      minValue = mes;
+    }
+    delay(10);
+  }
 
-  if(heartRate < 60 || heartRate > 100) {
+  Serial.print("max value");
+  Serial.println(maxValue);
+  maxValue = (maxValue + minValue)/2;
+  Serial.print("min value");
+  Serial.println(minValue);
+
+  pulseCount = 0;
+  firstRead = analogRead(sensorPin);
+  
+  while(millis() < startTime + 15000){
+    Serial.print("first read: ");
+    Serial.println(firstRead);
+    delay(160);
+    secondRead = analogRead(sensorPin);
+    Serial.print("second read: ");
+    Serial.println(secondRead);
+    if(secondRead > maxValue && firstRead < maxValue) {
+      pulseCount++;
+      Serial.println(pulseCount);
+    }
+    firstRead = secondRead;
+  }
+
+  pulse = pulseCount * 6;
+  Serial.println(pulse);
+  if(methodCounter > 3)
+  {
+    writePulseToDatabse();
+  }
+
+  if((pulse < 60 || pulse > 100) && methodCounter > 3) {
     isPulseAnomaly = true;
   }
   
@@ -185,10 +212,10 @@ bool detectPulseAnomaly() {
 }
 
 void writePulseToDatabse(){
-  Firebase.setInt("100/current_pulse/", heartRate);
+  Firebase.setInt("100/current_pulse", pulse);
   // handle error 
   if (Firebase.failed()) { 
-      Serial.print("pushing /logs failed:"); 
+      Serial.print("pushing /current_pulse failed:"); 
       Serial.println(Firebase.error());   
       return; 
    } 
@@ -196,6 +223,7 @@ void writePulseToDatabse(){
 }
 
 bool detectFall(){
+  Serial.println("Started to detect fall!");
   getMeasurements();
   currentAcc = sqrt(pow(xyz_g[0], 2) + pow(xyz_g[1], 2) + pow(xyz_g[2], 2));
   gForce = currentAcc / 9.82;
@@ -401,18 +429,18 @@ void writeFallDataToFirebase(){
       Serial.print("pushing /logs failed:"); 
       Serial.println(Firebase.error());   
       return; 
-   } 
+  } 
   delay(1000); 
 }
 
 void writePulseAnomalyToDatabase(){
-  Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", heartRate);
+  Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", pulse);
   
   // handle error 
   if (Firebase.failed()) { 
       Serial.print("pushing /logs failed:"); 
       Serial.println(Firebase.error());   
       return; 
-   } 
+  } 
   delay(1000); 
 }
