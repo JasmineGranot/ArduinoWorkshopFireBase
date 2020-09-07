@@ -36,7 +36,8 @@ void loop()
     
     mma8451.getMeasurement(xyz_g);
     currentAcc = sqrt(pow(xyz_g[0], 2) + pow(xyz_g[1], 2) + pow(xyz_g[2], 2));
-
+    Serial.println(currentAcc);
+    
     // Suspected A fall happend (fall threshold: value >= 6)
     if (currentAcc >= upperThreshold && fallCount == 0) {
       Serial.println(currentAcc);

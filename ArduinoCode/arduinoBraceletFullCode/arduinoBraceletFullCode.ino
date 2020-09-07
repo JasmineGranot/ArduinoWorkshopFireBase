@@ -13,10 +13,10 @@
 
 //================================ Wifi ================================
 WiFiServer  server(80);
-//char        ssid[]      = "Oslo";            // your network SSID name
-//char        pass[]      = "0526586120";      // your network password
-char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
-char        pass[]      = "0542005293";      // your network password
+char        ssid[]      = "Oslo";            // your network SSID name
+char        pass[]      = "0526586120";      // your network password
+//char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
+//char        pass[]      = "0542005293";      // your network password
 //================================ Wifi ================================
 
 //============================== Location ==============================
@@ -47,12 +47,13 @@ int           sensorPin       =     A0;                 // A0 is the input pin f
 boolean       isPulseAnomaly  =     false;
 float         mes;
 float         maxValue        =     0;
-float         minValue        =     2000;
+float         minValue        =     10000;
 float         firstRead;
 float         secondRead;
 int           startTime       =     millis();
 int           pulseCount      =     1;
 int           pulse;
+int           methodCounter   =     0;
 //================================ Pulse ===============================
 
 //=========================== Fall Detection ===========================
@@ -80,14 +81,14 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
-  //Serial.print("Connecting to ");
-  //Serial.println(ssid);
-  //WiFi.begin(ssid, pass);
-  /*while (WiFi.status() != WL_CONNECTED) 
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED) 
   {
     delay(500);
     Serial.print(".");
-  }*/
+  }
 
   // Connect to Firebase:
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH); 
@@ -129,17 +130,17 @@ void setup()
 
 void loop() 
 {
-  /*if(detectFall())
+  if(detectFall())
   {
     handleClientCommunication();
     writeFallDataToFirebase();
   }
 
-  delay(1000);*/
+  delay(1000);
   
   if(detectPulseAnomaly()){
-    //handleClientCommunication();
-    //writePulseAnomalyToDatabase();
+    handleClientCommunication();
+    writePulseAnomalyToDatabase();
   }
 }
 
@@ -158,6 +159,10 @@ void handleClientCommunication(){
 }
 
 bool detectPulseAnomaly() {
+  methodCounter++;
+  maxValue = 0;
+  startTime = millis();
+  
   while(millis() < startTime + 5000){
     mes = analogRead(sensorPin);
     if(mes > maxValue){
@@ -175,11 +180,10 @@ bool detectPulseAnomaly() {
   Serial.print("min value");
   Serial.println(minValue);
 
-
-  startTime = millis();
   pulseCount = 0;
   firstRead = analogRead(sensorPin);
-  while(millis() < startTime + 10000){
+  
+  while(millis() < startTime + 15000){
     Serial.print("first read: ");
     Serial.println(firstRead);
     delay(160);
@@ -195,9 +199,12 @@ bool detectPulseAnomaly() {
 
   pulse = pulseCount * 6;
   Serial.println(pulse);
-  //writePulseToDatabse();
+  if(methodCounter > 3)
+  {
+    writePulseToDatabse();
+  }
 
-  if(pulse < 60 || pulse > 100) {
+  if((pulse < 60 || pulse > 100) && methodCounter > 3) {
     isPulseAnomaly = true;
   }
   
@@ -205,10 +212,10 @@ bool detectPulseAnomaly() {
 }
 
 void writePulseToDatabse(){
-  Firebase.setInt("100/current_pulse/", pulse);
+  Firebase.setInt("100/current_pulse", pulse);
   // handle error 
   if (Firebase.failed()) { 
-      Serial.print("pushing /logs failed:"); 
+      Serial.print("pushing /current_pulse failed:"); 
       Serial.println(Firebase.error());   
       return; 
    } 
@@ -216,6 +223,7 @@ void writePulseToDatabse(){
 }
 
 bool detectFall(){
+  Serial.println("Started to detect fall!");
   getMeasurements();
   currentAcc = sqrt(pow(xyz_g[0], 2) + pow(xyz_g[1], 2) + pow(xyz_g[2], 2));
   gForce = currentAcc / 9.82;
@@ -421,18 +429,18 @@ void writeFallDataToFirebase(){
       Serial.print("pushing /logs failed:"); 
       Serial.println(Firebase.error());   
       return; 
-   } 
+  } 
   delay(1000); 
 }
 
-/*void writePulseAnomalyToDatabase(){
-  Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", heartRate);
+void writePulseAnomalyToDatabase(){
+  Firebase.setFloat("100/pulse_history/" + dayStamp + " " + timeStamp + "/heart_rate", pulse);
   
   // handle error 
   if (Firebase.failed()) { 
       Serial.print("pushing /logs failed:"); 
       Serial.println(Firebase.error());   
       return; 
-   } 
+  } 
   delay(1000); 
-}*/
+}
