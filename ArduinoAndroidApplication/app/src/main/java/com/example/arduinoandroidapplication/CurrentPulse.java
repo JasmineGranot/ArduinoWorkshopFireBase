@@ -189,11 +189,10 @@ public class CurrentPulse extends AppCompatActivity {
                     ref.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
-                            Animation animation;
-
-                            currentPulse = (TextView) findViewById(R.id.currentPulse);
-
-                            currentPulse.setText(snapshot.getValue().toString());
+                            if(!snapshot.getValue().toString().equals("0")) {
+                                currentPulse = (TextView) findViewById(R.id.currentPulse);
+                                currentPulse.setText(snapshot.getValue().toString());
+                            }
                         }
 
                         @Override
