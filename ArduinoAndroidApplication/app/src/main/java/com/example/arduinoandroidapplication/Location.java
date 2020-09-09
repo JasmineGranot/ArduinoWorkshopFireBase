@@ -1,7 +1,10 @@
 package com.example.arduinoandroidapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Pair;
 
@@ -80,20 +83,26 @@ public class Location extends FragmentActivity implements OnMapReadyCallback {
                             child(String.format("%s/falls", braceletId));
 
                     ValueEventListener valueEventListener = new ValueEventListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot ds : snapshot.getChildren()) {
                                 String date = ds.getKey();
+                                date = Utils.fixDate(date);
                                 Object data = ds.getValue();
                                 if (data != null) {
                                     if (data.getClass() == HashMap.class) {
                                         HashMap<String, Double> coords = (HashMap<String, Double>) data;
 
                                         if (!coords.isEmpty()) {
-                                            lat = coords.get("lat");
-                                            lng = coords.get("long");
-                                            fallLocation = new LatLng(lat, lng);
-                                            mMap.addMarker(new MarkerOptions().position(fallLocation).title(date));
+                                            try {
+                                                lat = coords.get("lat");
+                                                lng = coords.get("long");
+                                                fallLocation = new LatLng(lat, lng);
+                                                mMap.addMarker(new MarkerOptions().position(fallLocation).title(date));
+                                            }
+                                            catch (ClassCastException e){
+                                            }
                                         }
                                     }
                                 }

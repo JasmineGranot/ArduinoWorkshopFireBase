@@ -83,11 +83,11 @@ public class CurrentPulse extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull com.google.firebase.database.DataSnapshot snapshot, @Nullable String previousChildName) {
                     String dateTime = String.format("%s", snapshot.getKey());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
-                    LocalDateTime now = LocalDateTime.now().plusHours(3);
+                    LocalDateTime givenDateTime = Utils.convertStringToDate(dateTime);
+                    LocalDateTime localNow = Utils.makeLocalTime(LocalDateTime.now());
+                    LocalDateTime givenDate = Utils.makeLocalTime(givenDateTime);
 
-                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                    if(localNow.minusMinutes(1).isBefore(givenDate) &&
                             (!snapshot.hasChild("seen"))){
                         notification("Pulse Anomaly");
                         pulsedbref.child(snapshot.getKey()).child("seen").setValue(true);
@@ -116,11 +116,11 @@ public class CurrentPulse extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull com.google.firebase.database.DataSnapshot snapshot, @Nullable String previousChildName) {
                     String dateTime = String.format("%s", snapshot.getKey());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
+                    LocalDateTime givenDateTime = Utils.convertStringToDate(dateTime);
+                    LocalDateTime localNow = Utils.makeLocalTime(LocalDateTime.now());
+                    LocalDateTime givenDate = Utils.makeLocalTime(givenDateTime);
 
-                    LocalDateTime now = LocalDateTime.now().plusHours(3);
-                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                    if(localNow.minusMinutes(1).isBefore(givenDate) &&
                             (!snapshot.hasChild("seen"))){
                         notification("Fall");
                         falldbref.child(snapshot.getKey()).child("seen").setValue(true);

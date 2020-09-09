@@ -36,11 +36,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import io.grpc.okhttp.internal.Util;
 
 
 public class FallHistory extends AppCompatActivity {
@@ -85,11 +89,11 @@ public class FallHistory extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     String dateTime = String.format("%s", snapshot.getKey());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
-                    LocalDateTime now = LocalDateTime.now().plusHours(3);
+                    LocalDateTime givenDateTime = Utils.convertStringToDate(dateTime);
+                    LocalDateTime localNow = Utils.makeLocalTime(LocalDateTime.now());
+                    LocalDateTime givenDate = Utils.makeLocalTime(givenDateTime);
 
-                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                    if(localNow.minusMinutes(1).isBefore(givenDate) &&
                             (!snapshot.hasChild("seen"))){
                         notification("Pulse Anomaly");
                         pulsedbref.child(snapshot.getKey()).child("seen").setValue(true);
@@ -118,12 +122,11 @@ public class FallHistory extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     String dateTime = String.format("%s", snapshot.getKey());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    LocalDateTime givenDateTime = LocalDateTime.parse(dateTime, formatter);
+                    LocalDateTime givenDateTime = Utils.convertStringToDate(dateTime);
+                    LocalDateTime localNow = Utils.makeLocalTime(LocalDateTime.now());
+                    LocalDateTime givenDate = Utils.makeLocalTime(givenDateTime);
 
-                    LocalDateTime now = LocalDateTime.now().plusHours(3);
-
-                    if(now.minusMinutes(5).isBefore(givenDateTime.plusHours(2)) &&
+                    if(localNow.minusMinutes(1).isBefore(givenDate) &&
                             (!snapshot.hasChild("seen"))){
                         notification("Fall");
                         falldbref.child(snapshot.getKey()).child("seen").setValue(true);
@@ -183,11 +186,13 @@ public class FallHistory extends AppCompatActivity {
                             child(String.format("%s/falls", braceletId));
 
                     ValueEventListener valueEventListener = new ValueEventListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             List<String> dateList = new LinkedList<>();
                             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                 String date = ds.getKey();
+                                date = Utils.fixDate(date);
                                 dateList.add(date);
                             }
 
@@ -204,6 +209,7 @@ public class FallHistory extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void addDataToTable(List<String> dateList) {
         GradientDrawable gd = new GradientDrawable();
         gd.setColor(Color.parseColor("#DCDCDC"));
