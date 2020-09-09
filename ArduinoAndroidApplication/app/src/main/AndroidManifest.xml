@@ -13,9 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".EmergencyCall" />
-        <activity android:name=".FallHistory" />
-        <activity android:name=".PulseHistory" />
-        <activity android:name=".CurrentPulse" />
+        <activity android:name=".FallHistory"
+            android:parentActivityName=".ScreenMainActivity"/>
+        <activity android:name=".PulseHistory"
+            android:parentActivityName=".ScreenMainActivity"/>
+        <activity android:name=".CurrentPulse"
+            android:parentActivityName=".ScreenMainActivity"/>
         <activity android:name=".ScreenMainActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity">

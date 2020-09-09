@@ -17,10 +17,10 @@ MPU6050 mpu;
 
 //================================ Wifi ================================
 WiFiServer  server(80);
-//char        ssid[]      = "Oslo";            // your network SSID name
-//char        pass[]      = "0526586120";      // your network password
-char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
-char        pass[]      = "0542005293";      // your network password
+char        ssid[]      = "Oslo";            // your network SSID name
+char        pass[]      = "0526586120";      // your network password
+//char        ssid[]      = "HOTBOX 4-BC50";            // your network SSID name
+//char        pass[]      = "0542005293";      // your network password
 //================================ Wifi ================================
 
 //============================== Location ==============================
@@ -99,7 +99,7 @@ void setup()
 
   // Connect to Time client:
   timeClient.begin();
-  timeClient.setTimeOffset(3600);
+  //timeClient.setTimeOffset();
 
   // Initialize Fall Detector:
   Serial.println("Initialize MPU6050");
@@ -125,10 +125,10 @@ void loop()
 {
   if(isFallDetected)
   {
-    isFallDetected = false;
     fallCounter = 0;
     handleClientCommunication();
     writeFallDataToFirebase();
+    isFallDetected = false;
   }
   
   if(detectPulseAnomaly()){
