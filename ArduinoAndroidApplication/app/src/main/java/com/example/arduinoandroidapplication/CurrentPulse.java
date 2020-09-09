@@ -59,7 +59,7 @@ public class CurrentPulse extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_pulse);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         PulsatorLayout pulsatorLayout = (PulsatorLayout)findViewById(R.id.pulsator);
         pulsatorLayout.start();
 
